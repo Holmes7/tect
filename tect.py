@@ -3,8 +3,22 @@ import subprocess
 import os
 
 
-def change_duration(file, start, end):
-	pass
+def change_duration(old_file, new_file, start, end, delete_old_file):
+	subprocess.run([
+		'ffmpeg',
+		'-ss',
+		start,
+		'-i',
+		old_file,
+		'-to',
+		end,
+		'-c',
+		'copy',
+		new_file],
+		capture_output=True)
+
+	if delete_old_file:
+		os.remove(old_file)
 
 
 def download_mp4(url, itag):
@@ -18,14 +32,21 @@ def download_mp4(url, itag):
 		return False
 
 
-def mp4_to_mp3(mp4_path, new_name, delete):
-	pass
+def mp4_to_mp3(mp4_file, mp3_file, delete_old_file):
+	subprocess.run([
+		'ffmpeg',
+		'-i',
+		mp4_file,
+		mp3_file])
+
+	if delete_old_file:
+		os.remove(mp4_file)
 
 
 def video_info(url):
 	info_dict = {}
 	try:
-		vid = pytube.Youtube(url)
+		vid = pytube.YouTube(url)
 		streams = vid.streams
 		info_dict["title"] = vid.title
 		info_dict["streams"] = [{}]
@@ -39,4 +60,11 @@ def video_info(url):
 		return info_dict
 
 	except Exception as e:
-		return False
+		return e
+
+
+# var = video_info('https://www.youtube.com/watch?v=6su62xI2x2Q')
+# print(var)
+# download_mp4('https://www.youtube.com/watch?v=6su62xI2x2Q', '140')
+# mp4_to_mp3('123.mp4', '143.mp3', False)
+change_duration('143.mp3', '144.mp3', '00:00:00', '00:05:00', False)
